@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông Thư Bát Cổ</title>
+  <meta name="description" content="Ứng dụng tra cứu Bản Mệnh Bát Trạch, Thơ Ca Quyết, Hôn Phối Vợ Chồng, Đẻ Con, Vận Hạn Á Đông, Xem Ngày Thông Thư và Tính Trùng Tang.">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Thông Thư Bát Cổ">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>🔮 THÔNG THƯ BÁT CỔ</h1>
+  <p>Hệ thống tra cứu chuẩn xác theo Thuật toán Hồ Ngọc Đức, Cổ thư Bát Trạch, Sách Thông Thư Ngọc Hạp & Sim Kinh Dịch</p>
+</header>
+
+<main class="container">
+  <!-- KHUNG NHẬP LIỆU CHÍNH: ĐƯƠNG SỐ -->
+  <div class="card">
+    <div class="card-header">
+      <h2><span>👤</span> Thông Tin Đương Số Tra Cứu</h2>
+    </div>
+    <form id="mainForm" class="form-grid">
+      <div class="form-group">
+        <label for="dob">Ngày sinh Dương Lịch:</label>
+        <input type="date" id="dob" required value="2003-11-27">
+      </div>
+      <div class="form-group">
+        <label for="gioiTinh">Giới tính:</label>
+        <select id="gioiTinh">
+          <option value="nam" selected>Nam mạng</option>
+          <option value="nu">Nữ mạng</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="gioSinh">Giờ sinh:</label>
+        <select id="gioSinh">
+          <option value="0">Giờ Tý • 23:00 - 00:59</option>
+          <option value="1">Giờ Sửu • 01:00 - 02:59</option>
+          <option value="2">Giờ Dần • 03:00 - 04:59</option>
+          <option value="3">Giờ Mão • 05:00 - 06:59</option>
+          <option value="4">Giờ Thìn • 07:00 - 08:59</option>
+          <option value="5">Giờ Tỵ • 09:00 - 10:59</option>
+          <option value="6">Giờ Ngọ • 11:00 - 12:59</option>
+          <option value="7">Giờ Mùi • 13:00 - 14:59</option>
+          <option value="8">Giờ Thân • 15:00 - 16:59</option>
+          <option value="9">Giờ Dậu • 17:00 - 18:59</option>
+          <option value="10" selected>Giờ Tuất • 19:00 - 20:59</option>
+          <option value="11">Giờ Hợi • 21:00 - 22:59</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="namXet">Năm muốn xem vận hạn:</label>
+        <input type="number" id="namXet" min="1925" max="2100" value="2026">
+      </div>
+      <button type="submit" class="btn-primary">🔍 Tra Cứu Toàn Diện</button>
+    </form>
+  </div>
+
+  <!-- KẾT QUẢ HIỂN THỊ -->
+  <div id="resultArea">
+    <!-- BANNER TỔNG QUAN -->
+    <div class="hero-banner">
+      <div class="hero-icon" id="heroIcon">🐐</div>
+      <div style="flex: 1;">
+        <div class="hero-title" id="heroTitle">Tuổi Quý Mùi • 2003 • Dương Liễu Mộc</div>
+        <div class="hero-subtitle" id="heroSubtitle">Âm Nam • Cung Càn • Tây Tứ Mệnh</div>
+        <div class="badge-group" id="heroBadges"></div>
+        <div id="heroTuoiMuNote" style="margin-top:10px; font-size:0.85rem; color:#94a3b8; display:flex; align-items:center; gap:6px;">
+          <span>💡</span>
+          <span id="heroTuoiMuNoteText">Quy ước tuổi mụ Á Đông: Tuổi mụ = Năm xét Âm lịch - Năm sinh Âm lịch + 1.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS ĐIỀU HƯỚNG CHUYÊN SÂU (4 TABS TINH GỌN) -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab1">🏛️ Bản Mệnh & Hôn Phối</button>
+      <button class="tab-btn" data-tab="tab5">🌌 Lá Số Tử Vi Đẩu Số</button>
+      <button class="tab-btn" data-tab="tab6">☯️ Lá Số Bát Tự - Tứ Trụ</button>
+      <button class="tab-btn" data-tab="tab2">⚡ Vận Hạn Năm Nay</button>
+      <button class="tab-btn" data-tab="tab3">📖 Xem Ngày Thông Thư</button>
+      <button class="tab-btn" data-tab="tab4">🕊️ Tính Trùng Tang</button>
+    </div>
+
+    <!-- TAB 1: BẢN MỆNH, THƠ CA QUYẾT & HÔN PHỐI GIA ĐẠO (ĐÃ GỘP TOÀN DIỆN) -->
+    <div id="tab1" class="tab-content active">
+      <!-- 1. BẢN MỆNH BÁT TRẠCH -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span>🧭</span> Bản Mệnh Bát Trạch & Phong Thủy Không Gian</h2>
+        </div>
+        <div class="grid-2">
+          <div class="info-box">
+            <h3><span>🌟</span> Cung Mệnh & Ngũ Hành</h3>
+            <p><strong>Mạng nạp âm:</strong> <span id="txtMang">Dương Liễu Mộc</span></p>
+            <p><strong>Cung phi:</strong> <span id="txtCung">Càn • Hành Kim</span></p>
+            <p><strong>Tứ trạch:</strong> <span id="txtTuTrach">Tây tứ trạch</span></p>
+            <p><strong>Hợp hành:</strong> <span id="txtHopHanh">Kim, Thủy</span></p>
+            <p><strong>Màu sắc hợp:</strong> <span id="txtMauHop">Trắng, bạc, xám, đen</span></p>
+            <p><strong>Con số may mắn:</strong> <span id="txtSoHop">6, 7</span></p>
+            <p><strong>Tuổi xung khắc:</strong> <span id="txtTuoiKhac" class="badge bad">Ất Sửu, Tân Sửu</span></p>
+          </div>
+          <div class="info-box">
+            <h3><span>📆</span> Ngày Giờ Tốt Cho Tuổi Này</h3>
+            <p><strong>Tháng tốt trong năm:</strong> <span id="txtThangTot" class="badge good">1, 6, 7, 8, 9, 10, 12</span></p>
+            <p><strong>Ngày tốt hợp tuổi:</strong> <span id="txtNgayTot" class="badge good">Mùi, Thân, Dậu, Tuất, Hợi, Sửu, Dần</span></p>
+            <p><strong>Tên hay nên đặt:</strong> <span id="txtTenNenDat">Phương, Bình, Nghệ, Lương, Khoa, Vinh, Thụ, Phú, Thanh...</span></p>
+          </div>
+        </div>
+
+        <h3 style="color: var(--gold); margin: 24px 0 10px;">Bát Hướng Đồ Bản Phong Thủy</h3>
+        <table class="huong-table">
+          <thead>
+            <tr>
+              <th style="color: #6ee7b7; background: #082d23;">BỐN HƯỚNG CÁT KHÍ</th>
+              <th style="color: #fca5a5; background: #341219;">BỐN HƯỚNG HUNG KHÍ</th>
+            </tr>
+          </thead>
+          <tbody id="tblHuong"></tbody>
+        </table>
+
+        <h3 style="color: var(--gold); margin: 24px 0 10px;">Bố Trí Không Gian Phong Thủy Chuẩn Thước Lỗ Ban</h3>
+        <div class="grid-3">
+          <div class="info-box highlight">
+            <h3><span>🚪</span> Hướng Nhà, Bàn Thờ, Giường Ngủ</h3>
+            <p id="txtHuongNha">Mão, Sinh khí, Tiến điền, Chính Đông...</p>
+          </div>
+          <div class="info-box">
+            <h3><span>🍳</span> Hướng Bếp Nấu • Tọa Hung Hướng Cát</h3>
+            <p id="txtHuongBep">Ất, Ngũ quỷ, Khốc khấp, Chính Đông...</p>
+          </div>
+          <div class="info-box">
+            <h3><span>🚿</span> Hướng Khu Vệ Sinh • Tọa Hung Trấn Hung</h3>
+            <p id="txtHuongVeSinh">Nhâm, Lục sát, Tự ải, Chính Bắc...</p>
+          </div>
+        </div>
+
+        <h3 style="color: var(--gold); margin: 24px 0 10px;">Bố Trí Vật Phẩm Phong Thủy Kích Hoạt Vượng Khí</h3>
+        <div class="grid-4">
+          <div class="info-box">
+            <h3 style="font-size:0.9rem;"><span>🩺</span> Sức Khỏe</h3>
+            <p id="txtVpSucKhoe" style="font-size:0.88rem;">Đặt bình hoa to, tranh chim hạc...</p>
+          </div>
+          <div class="info-box">
+            <h3 style="font-size:0.9rem;"><span>📚</span> Trí Tuệ</h3>
+            <p id="txtVpTriTue" style="font-size:0.88rem;">Đặt tháp Văn Xương, tâm kinh...</p>
+          </div>
+          <div class="info-box">
+            <h3 style="font-size:0.9rem;"><span>🎖️</span> Công Danh</h3>
+            <p id="txtVpCongDanh" style="font-size:0.88rem;">Đặt ấn ngọc, tượng rồng phong thủy...</p>
+          </div>
+          <div class="info-box">
+            <h3 style="font-size:0.9rem;"><span>💰</span> Tài Lộc</h3>
+            <p id="txtVpTaiLoc" style="font-size:0.88rem;">Bể cá hướng Tây Nam, tranh sơn thủy...</p>
+          </div>
+        </div>
+
+        <h3 style="color: var(--gold); margin: 24px 0 10px;">Tử Vi Trọn Đời Bản Mệnh</h3>
+        <div class="info-box" style="border-left:4px solid var(--gold);">
+          <p id="txtTuViTronDoi" style="text-align: justify; line-height: 1.85;">Nội dung tử vi trọn đời...</p>
+        </div>
+      </div>
+
+      <!-- 2. THƠ CA QUYẾT & LUẬN GIẢI BẢN MỆNH -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span>📜</span> Thơ Ca Quyết & Luận Giải Bản Mệnh</h2>
+        </div>
+        <div class="grid-2" style="align-items:stretch;">
+          <div class="poem-col">
+            <h3 style="color:var(--gold);">Bài Thơ Tuổi Bản Mệnh</h3>
+            <div class="poem-card" id="poemTuoi">Đang tải bài thơ...</div>
+          </div>
+          <div class="poem-col">
+            <h3 style="color:var(--gold);">Bài Thơ Hàng Can <span id="lblTenCan">Quý</span></h3>
+            <div class="poem-card" id="poemCan">Đang tải bài thơ...</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 20px;">
+          <div class="info-box highlight" style="line-height:1.8; text-align: justify;">
+            <h3 style="color:var(--gold);"><span>🐾</span> Linh Vật Tượng Trưng & Khí Chất</h3>
+            <p id="txtTuongConVat">Đang tải...</p>
+          </div>
+          <div class="info-box" style="line-height:1.8; text-align: justify;">
+            <h3 style="color:var(--gold);"><span>💡</span> Luận Giải Vận Mệnh Cốt Lõi</h3>
+            <p id="txtLuanChung">Đang tải...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. HÔN PHỐI VỢ CHỒNG & KẾ HOẠCH SINH CON -->
+      <div class="card">
+        <div class="card-header">
+          <h2><span>💍</span> Tra Cứu Hôn Phối Vợ Chồng & Gia Đạo</h2>
+        </div>
+        <div class="form-grid" style="margin-bottom: 16px;">
+          <div class="form-group">
+            <label>Năm sinh Chồng:</label>
+            <input type="number" id="txtNamChong" min="1925" max="2050" value="2003">
+          </div>
+          <div class="form-group">
+            <label>Năm sinh Vợ:</label>
+            <input type="number" id="txtNamVo" min="1925" max="2050" value="2005">
+          </div>
+          <button type="button" id="btnSoCung" class="btn-primary">Xem Hợp Khắc Vợ Chồng</button>
+        </div>
+
+        <div id="resVoChong" class="info-box highlight" style="display:none; margin-top:14px;">
+          <div style="font-size:1.25rem; font-weight:800; color:var(--gold);" id="vcKetQua">Chồng Càn • Vợ Ly • Cung Tuyệt Mệnh</div>
+          <div id="vcChiTiet" style="margin: 8px 0; font-size:0.95rem;"></div>
+          <h4 style="margin: 12px 0 4px; color:var(--gold);">Bài Thơ Ca Quyết Hôn Phối Cổ Bản:</h4>
+          <div class="poem-card" id="vcTho"></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="section-title"><span>👶</span> Kế Hoạch Sinh Con Hợp Tuổi Bố Mẹ 10 Năm Tới</div>
+        <p class="subtext">Phân tích chuyên sâu Ngũ Hành, Thiên Can, Địa Chi Tam Hợp, Lục Hợp giữa con với cả cha và mẹ trong 10 năm tới để chọn năm ĐẠI CÁT nhất:</p>
+        <button type="button" id="btnTinhSinhCon" class="btn-primary" style="margin-bottom:14px;">📅 Quét Bảng 10 Năm Sinh Con</button>
+
+        <div id="boxBangSinhCon" style="display:none; overflow-x:auto;">
+          <table class="plan-table">
+            <thead>
+              <tr>
+                <th>Năm Sinh</th>
+                <th>Tuổi Con</th>
+                <th>Mạng Nạp Âm</th>
+                <th>Điểm Cát</th>
+                <th>Đánh Giá</th>
+                <th>Chi Tiết Tương Hợp Với Bố Mẹ</th>
+              </tr>
+            </thead>
+            <tbody id="tblKeHoachCon"></tbody>
+          </table>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="section-title"><span>🔮</span> Tra Con Theo Bảng Cung Đình & Lục Đạo</div>
+        <div class="grid-2">
+          <!-- TRA CON GÌ -->
+          <div class="info-box">
+            <h3><span>🌟</span> Tra Cung Số Con Theo Lục Đạo</h3>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label>Tuổi Chi của Mẹ:</label>
+              <select id="selMeChi">
+                <option value="Tý">Tý</option>
+                <option value="Sửu">Sửu</option>
+                <option value="Dần">Dần</option>
+                <option value="Mão">Mão</option>
+                <option value="Thìn">Thìn</option>
+                <option value="Tị">Tị</option>
+                <option value="Ngọ">Ngọ</option>
+                <option value="Mùi" selected>Mùi</option>
+                <option value="Thân">Thân</option>
+                <option value="Dậu">Dậu</option>
+                <option value="Tuất">Tuất</option>
+                <option value="Hợi">Hợi</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label>Tháng Thụ Thai Âm Lịch:</label>
+              <select id="selThangThu">
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4">Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+              </select>
+            </div>
+            <button type="button" id="btnTraCon" class="btn-primary" style="width:100%;">Tra Vận Mệnh Con</button>
+
+            <div id="resTraCon" style="display:none; margin-top:14px;">
+              <div style="font-weight:700; color:var(--gold); font-size:1.05rem;" id="lblConGi"></div>
+              <p id="descConGi" style="font-size:0.92rem; line-height:1.7; margin:6px 0;"></p>
+              <div class="poem-card" id="thoConGi" style="font-size:0.88rem;"></div>
+            </div>
+          </div>
+
+          <!-- TRA SINH CON TRAI HAY GÁI -->
+          <div class="info-box">
+            <h3><span>👶</span> Dự Đoán Giới Tính Con Theo Cổ Thư</h3>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label>Tuổi Mụ của Mẹ khi mang thai:</label>
+              <input type="number" id="txtTuoiMe" min="18" max="40" value="24">
+              <div class="subtext" style="margin-top:4px; font-size:0.8rem;" id="noteTuoiMe">Tuổi mụ mẹ = Năm thụ thai ÂL - Năm sinh ÂL mẹ + 1 (Bảng áp dụng từ 18 đến 40 tuổi mụ).</div>
+            </div>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label>Tháng Thụ Thai Âm Lịch:</label>
+              <select id="selThangThu2">
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4">Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7" selected>Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+              </select>
+            </div>
+            <button type="button" id="btnTraiGai" class="btn-primary" style="width:100%;">Dự Đoán Giới Tính</button>
+
+            <div id="resTraiGai" style="display:none; margin-top:14px; text-align:center;">
+              <div style="font-size:2.4rem;" id="iconTraiGai">👦</div>
+              <div style="font-size:1.35rem; font-weight:800; color:var(--gold);" id="lblTraiGai">Dự đoán: Con Trai</div>
+              <p class="subtext">Theo Bảng Cung Đình lịch cổ phương Đông</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: VẬN HẠN NĂM NAY -->
+    <div id="tab2" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2><span>⚡</span> Vận Hạn Năm <span id="lblNamXet">2026</span> <span id="lblCanChiNamXet">Bính Ngọ</span> • Tuổi Mụ: <span id="lblTuoiMu">24</span></h2>
+        </div>
+
+        <!-- CĂN CỨ & CÔNG THỨC TÍNH TUỔI MỤ XÉT VẬN HẠN -->
+        <div class="info-box highlight" style="margin-bottom:18px; border-left: 4px solid var(--gold);">
+          <div style="font-weight:700; color:var(--gold); font-size:0.95rem; display:flex; align-items:center; gap:6px;">
+            <span>💡</span> Căn Cứ & Công Thức Tính Tuổi Mụ Xét Vận Hạn
+          </div>
+          <p style="margin:6px 0 0; font-size:0.9rem; line-height:1.7; color:#cbd5e1;">
+            Đương số sinh ngày <strong><span id="vhDobDuong">27/11/2003</span></strong> Dương lịch, tương ứng năm sinh Âm lịch <strong><span id="vhCanChiSinh">Quý Mùi</span> (<span id="vhNamSinhAm">2003</span>)</strong>.<br>
+            Bước sang năm xem hạn <strong><span id="vhNamXet">2026</span> (<span id="vhCanChiXet">Bính Ngọ</span>)</strong>: 
+            Tuổi mụ = Năm xét (<span id="vhNamXet2">2026</span>) - Năm sinh Âm lịch (<span id="vhNamSinhAm2">2003</span>) + 1 = <strong style="color:var(--gold); font-size:1rem;"><span id="vhTuoiMu">24</span> tuổi mụ</strong>.<br>
+            <span class="subtext" style="color:#94a3b8;">Toàn bộ hệ thống Sao Cửu Diệu, Bát Hạn, Hạn Kim Lâu và Hoang Ốc dưới đây được tra cứu chuẩn xác theo đúng mốc <span id="vhTuoiMu2">24</span> tuổi mụ này.</span>
+          </p>
+        </div>
+        
+        <!-- BỘ 4 THẦN SÁT LƯU NIÊN Á ĐÔNG: CỬU DIỆU, BÁT HẠN, KIM LÂU, HOANG ỐC -->
+        <div class="grid-4" style="margin-bottom: 20px;">
+          <!-- 1. CỬU DIỆU SAO CHIẾU -->
+          <div class="info-box highlight">
+            <h3><span>⭐</span> Cửu Diệu Lưu Niên</h3>
+            <div id="boxSaoChieu" style="font-size: 1.15rem; font-weight: 700; margin: 4px 0; color:var(--gold);">Sao Kế Đô • Hung Tinh</div>
+            <p class="subtext" id="descSaoChieu">Ý nghĩa sao...</p>
+          </div>
+
+          <!-- 2. BÁT NIÊN HẠN -->
+          <div class="info-box">
+            <h3><span>⚠️</span> Bát Niên Hạn</h3>
+            <div id="boxHanTuoi" style="font-size: 1.15rem; font-weight: 700; margin: 4px 0; color:#fca5a5;">Hạn Địa Võng</div>
+            <p class="subtext" id="descHanTuoi">Thị phi điều tiếng...</p>
+          </div>
+
+          <!-- 3. HẠN KIM LÂU -->
+          <div class="info-box">
+            <h3><span>🏠</span> Hạn Kim Lâu</h3>
+            <div id="boxKimLau" style="margin: 4px 0;">Đang tính...</div>
+            <p class="subtext">Kỵ làm nhà, cưới hỏi, đại sự</p>
+          </div>
+
+          <!-- 4. HẠN HOANG ỐC -->
+          <div class="info-box">
+            <h3><span>🏚️</span> Hạn Hoang Ốc</h3>
+            <div id="boxHoangOc" style="margin: 4px 0;">Đang tính...</div>
+            <p class="subtext">Sáu cung xây cất nhà cổ truyền</p>
+          </div>
+        </div>
+
+        <!-- TAM TAI & NGŨ ĐẠI PHẠM THÁI TUẾ -->
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div class="info-box">
+            <h3><span>🌀</span> Hạn Tam Tai</h3>
+            <div id="boxTamTai" style="margin-bottom:8px;">Đang tính...</div>
+            <p id="descTamTaiChiTiet" class="subtext">Phân tích tính chất Tam Tai năm xét...</p>
+          </div>
+
+          <div class="info-box">
+            <h3><span>🛡️</span> Ngũ Đại Phạm Thái Tuế</h3>
+            <div id="boxThaiTue">Đang tính...</div>
+          </div>
+        </div>
+
+        <!-- CHI TIẾT THƠ CA QUYẾT SAO HẠN Á ĐÔNG -->
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div class="info-box">
+            <h3 style="color:var(--gold);"><span>📜</span> Thơ Ca Quyết Sao Chiếu Mệnh</h3>
+            <div class="poem-card" id="poemSaoChieu" style="font-size:0.92rem;">Đang tải bài thơ sao chiếu...</div>
+          </div>
+          <div class="info-box">
+            <h3 style="color:#fca5a5;"><span>📜</span> Thơ Ca Quyết Niên Hạn Tuổi</h3>
+            <div class="poem-card" id="poemHanTuoi" style="font-size:0.92rem;">Đang tải bài thơ niên hạn...</div>
+          </div>
+        </div>
+
+        <!-- HƯỚNG DẪN CÚNG NGHINH SAO & BÀI VĂN KHẤN DÂNG SAO GIẢI HẠN CHUẨN CỔ BẢN -->
+        <div class="cung-box" id="boxGiaiHanSao">
+          <h4><span>🕯️</span> Nghi Thức Nghinh Sao Giải Hạn & Bài Vị Cổ Bản</h4>
+          <div class="grid-2">
+            <div>
+              <p><strong>Bài vị Thần Quân:</strong> <span id="cungBaiVi" style="color:var(--gold); font-weight:700;">Thiên Cung Thần Thủ...</span></p>
+              <p><strong>Màu sắc bài vị:</strong> <span id="cungMau">Màu vàng</span></p>
+              <p><strong>Thời gian cúng:</strong> <span id="cungGio">21h - 23h ngày 18 âm lịch</span></p>
+            </div>
+            <div>
+              <p><strong>Đèn nến & Lễ bái:</strong> <span id="cungNen">Thắp 20 ngọn nến, lạy 20 cái</span></p>
+              <p><strong>Hướng quay lạy:</strong> <span id="cungHuong">Chính Tây</span></p>
+            </div>
+          </div>
+
+          <h4 style="margin: 16px 0 6px; color:var(--gold);"><span>📜</span> Bài Văn Khấn Dâng Sao Giải Hạn Cổ Truyền:</h4>
+          <div class="poem-card" id="vanKhanSao" style="font-size:0.92rem; line-height:1.9;">
+            Nam mô A Di Đà Phật! • Ba lần<br>
+            - Con lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.<br>
+            - Nam mô Hiệu Thiên chí tôn Kim Quyết Ngọc Hoàng Thượng đế.<br>
+            - Con kính lạy Đức Trung Thiên tinh chúa Bắc cực Tử vi Tràng Sinh Đại đế.<br>
+            - Con kính lạy ngài Tả Nam Tào Lục Ty Duyên Thọ Tinh quân.<br>
+            - Con kính lạy Đức Hữu Bắc Đẩu Cửu hàm Giải ách Tinh quân.<br>
+            - Con kính lạy Đức Bản Mệnh Tinh Quân cai quản niên khóa.<br>
+            Hôm nay là ngày... tháng... năm... Tín chủ con thành tâm sắm sửa hương hoa trà quả, thắp nén tâm hương dâng lên trước án, cúi xin chư vị Thần Quân phù hộ độ trì toàn gia bình an, tai qua nạn khỏi, sở cầu tất ứng, sở nguyện tòng tâm.
+          </div>
+        </div>
+
+        <!-- HƯỚNG DẪN CÚNG GIẢI TAM TAI CỔ TRUYỀN -->
+        <div class="cung-box" id="boxGiaiTamTai" style="margin-top: 18px; border-color: #854d0e;">
+          <h4 style="color: var(--gold);"><span>🛡️</span> Phương Pháp Hóa Giải Tam Tai Cổ Truyền</h4>
+          <p><strong>Vị thần cai quản năm:</strong> <span id="ttQuan">Châu Vương hành khiển...</span></p>
+          <p><strong>Hướng & ngày cúng:</strong> <span id="ttNgayHuong">Cúng ông Bạch Sát ngày 8 AL quay về hướng Tây Nam...</span></p>
+          <p style="text-align: justify; margin-top:8px;"><strong>Lễ vật & Nghi thức:</strong> <span id="ttLeVat">Lễ vật gồm bộ tam sinh gồm thịt luộc, trứng luộc, tôm luộc, 3 nén hương, 3 ly rượu, 3 điếu thuốc, hoa quả, vàng mã tam tai, tóc móng tay gói lại đem thả sông hoặc ngã ba đường sau khi hóa vàng.</span></p>
+        </div>
+
+        <!-- BẢNG DỰ BÁO LƯU NGUYỆT 12 THÁNG ÂM LỊCH TRONG NĂM XÉT -->
+        <div class="section-divider"></div>
+        <div class="section-title"><span>📅</span> Bảng Dự Báo Vận Khí 12 Tháng Âm Lịch Năm <span id="lblNamXetBang">2026</span></div>
+        <p class="subtext">Phân tích đối soát Can Chi, Ngũ Hành giữa 12 tháng âm lịch lưu niên với bản mệnh đương số để định hướng hành sự cát lành:</p>
+        
+        <div style="overflow-x:auto;">
+          <table class="plan-table">
+            <thead>
+              <tr>
+                <th style="width:140px;">Tháng Âm Lịch</th>
+                <th style="width:130px;">Can Chi Tháng</th>
+                <th style="width:130px;">Đánh Giá</th>
+                <th>Dự Báo Vận Thế & Lời Khuyên Ứng Xử</th>
+              </tr>
+            </thead>
+            <tbody id="tblLuuNguyet"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: XEM NGÀY THÔNG THƯ -->
+    <div id="tab3" class="tab-content">
+      <!-- TRA CỨU CHI TIẾT TỪNG NGÀY -->
+      <div class="card" id="boxChiTietNgayArea">
+        <div class="card-header">
+          <h2><span>📖</span> Tra Cứu Toàn Diện Sao Chiếu & Hung Cát Theo Ngày</h2>
+        </div>
+
+        <div class="form-grid" style="margin-bottom: 20px;">
+          <div class="form-group">
+            <label for="dateXemNgay">Chọn ngày Dương Lịch cần tra cứu:</label>
+            <input type="date" id="dateXemNgay">
+          </div>
+          <button type="button" id="btnXemNgay" class="btn-primary">Xem Chi Tiết Ngày</button>
+        </div>
+
+        <!-- KHUNG ĐÁNH GIÁ ĐỘ HỢP VỚI ĐƯƠNG SỐ -->
+        <div class="score-box" id="boxScoreNgay">
+          <div>
+            <div style="font-size:0.95rem; font-weight:700; color:#e2e8f0;">ĐÁNH GIÁ ĐỘ HỢP VỚI ĐƯƠNG SỐ:</div>
+            <div style="font-size:1.35rem; font-weight:800; color:#6ee7b7;" id="lblXepLoaiNgay">Đại Cát • Rất hợp với đương số</div>
+            <div class="subtext" id="lblDuongSoName">Đương số tuổi Quý Mùi • Dương Liễu Mộc</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="score-num" id="lblDiemNgay">85/100</div>
+            <div class="subtext">Điểm Cát Khí</div>
+          </div>
+        </div>
+
+        <!-- CHI TIẾT ĐỐI XUNG - TƯƠNG HỢP VỚI ĐƯƠNG SỐ -->
+        <div class="info-box" style="margin-bottom:20px;">
+          <h3 style="color:var(--gold);"><span>🔍</span> Phân Tích Mức Độ Tương Hợp Giữa Ngày & Bản Mệnh</h3>
+          <div id="listTuongHop" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <!-- BẢNG KHUYẾN NGHỊ KHỞI SỰ THEO MỤC ĐÍCH CÔNG VIỆC (PHONG THỦY THIÊN MINH) -->
+        <div class="info-box highlight" style="margin-bottom:20px; border-left: 4px solid var(--gold);">
+          <h3 style="color:var(--gold); margin-top:0;"><span>⚖️</span> Thẩm Định Khởi Sự Các Hạng Mục Công Việc</h3>
+          <p class="subtext">Đối chiếu tính chất cát hung của ngày với từng mục đích đại sự của đương số theo chuẩn Trạch nhật Phong Thủy Thiên Minh:</p>
+          <div class="grid-3" id="boxKhuyenNghiThienMinh" style="margin-top:12px; gap:12px;"></div>
+        </div>
+
+        <!-- CẢNH BÁO CÁC NGÀY KIÊNG KỴ ĐẶC BIỆT THEO SÁCH THÔNG THƯ (CON NƯỚC, SÁT CHỦ, THỤ TỬ...) -->
+        <div class="card" style="margin-bottom: 20px; background:#111827;">
+          <h3 style="color:var(--gold); margin:0 0 10px;"><span>⚠️</span> Kiểm Tra Ngày Kiêng Kỵ Dân Gian</h3>
+          <p class="subtext">Tự động đối soát các ngày đại kỵ dân gian: Ngày Con Nước, Sát Chủ Dương, Sát Chủ Âm, Thụ Tử, Tam Nương, Nguyệt Kỵ, Dương Công Kỵ Nhật.</p>
+          
+          <div class="alert-grid" id="boxKiemTraNgayKỵ">
+            <!-- 1. Ngày Con Nước -->
+            <div class="alert-card" id="cardConNuoc">
+              <div class="alert-header">
+                <span class="alert-title">🌊 Ngày Con Nước</span>
+                <span id="badgeConNuoc" class="badge">Kiểm tra</span>
+              </div>
+              <div class="alert-body" id="descConNuoc"></div>
+            </div>
+
+            <!-- 2. Ngày Sát Chủ Dương -->
+            <div class="alert-card" id="cardSatChuDuong">
+              <div class="alert-header">
+                <span class="alert-title">⚔️ Sát Chủ Dương</span>
+                <span id="badgeSatChuDuong" class="badge">Kiểm tra</span>
+              </div>
+              <div class="alert-body" id="descSatChuDuong"></div>
+            </div>
+
+            <!-- 3. Ngày Sát Chủ Âm -->
+            <div class="alert-card" id="cardSatChuAm">
+              <div class="alert-header">
+                <span class="alert-title">⚰️ Sát Chủ Âm</span>
+                <span id="badgeSatChuAm" class="badge">Kiểm tra</span>
+              </div>
+              <div class="alert-body" id="descSatChuAm"></div>
+            </div>
+
+            <!-- 4. Ngày Thụ Tử -->
+            <div class="alert-card" id="cardThuTu">
+              <div class="alert-header">
+                <span class="alert-title">💀 Ngày Thụ Tử</span>
+                <span id="badgeThuTu" class="badge">Kiểm tra</span>
+              </div>
+              <div class="alert-body" id="descThuTu"></div>
+            </div>
+
+            <!-- 5. Ngày Tam Nương -->
+            <div class="alert-card" id="cardTamNuong">
+              <div class="alert-header">
+                <span class="alert-title">🌙 Ngày Tam Nương</span>
+                <span id="badgeTamNuong" class="badge">Kiểm tra</span>
+              </div>
+              <div class="alert-body" id="descTamNuong"></div>
+            </div>
+
+            <!-- 6. Ngày Nguyệt Kỵ & Dương Công -->
+            <div class="alert-card" id="cardNguyetKy">
+              <div class="alert-header">
+                <span class="alert-title">🚫 Nguyệt Kỵ & Dương Công</span>
+                <span id="badgeNguyetKy" class="badge">Kiểm tra</span>
+              </div>
+              <div class="alert-body" id="descNguyetKy"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CÁC SAO CHIẾU NGÀY HÔM ẤY THEO SÁCH THÔNG THƯ NGỌC HẠP -->
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="color:var(--gold); margin:0 0 6px;"><span>🌟</span> Các Sao Chiếu Trong Ngày</h3>
+          <p class="subtext">Chi tiết toàn bộ Cát Tinh mang lại may mắn, phúc lộc và Hung Tinh cần phòng tránh, kiêng cữ hội tụ trong ngày.</p>
+          
+          <div style="margin-top: 14px;">
+            <h4 style="color:#6ee7b7; display:flex; align-items:center; gap:6px; margin: 10px 0 6px;">
+              <span>✨</span> CÁT TINH CHIẾU NGÀY: <span id="lblCountCat" class="badge good">0 sao</span>
+            </h4>
+            <div class="star-grid" id="snCatTinhList"></div>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <h4 style="color:#fca5a5; display:flex; align-items:center; gap:6px; margin: 10px 0 6px;">
+              <span>⚡</span> HUNG TINH CHIẾU NGÀY: <span id="lblCountHung" class="badge bad">0 sao</span>
+            </h4>
+            <div class="star-grid" id="snHungTinhList"></div>
+          </div>
+        </div>
+
+        <!-- THÔNG TIN NGÀY THEO THÔNG THƯ NGỌC HẠP & PHONG THỦY THIÊN MINH -->
+        <div class="grid-3" style="margin-bottom:16px;">
+          <div class="info-box highlight">
+            <h3><span>☀️</span> Lịch Ngày & Tiết Khí</h3>
+            <p><strong>Dương Lịch:</strong> <span id="snDuong">25/10/2026</span></p>
+            <p><strong>Âm Lịch:</strong> <span id="snAm">16/09/2026</span></p>
+            <p><strong>Can Chi ngày:</strong> <span id="snCanChiNgay" style="font-weight:700; color:var(--gold);">Giáp Thìn</span></p>
+            <p><strong>Nạp âm ngày:</strong> <span id="snNapAmNgay">Phúc Đăng Hỏa</span></p>
+            <p><strong>Trực:</strong> <span id="snTruc" class="badge good">Trực Trừ</span></p>
+            <div class="poem-card" id="snThoTruc" style="font-size:0.83rem; padding:6px 10px; margin-top:6px; line-height:1.6;"></div>
+            <p style="margin-top:6px;"><strong>Hoàng Đạo:</strong> <span id="snHoangDao" class="badge gold">Ngày Hoàng Đạo</span></p>
+          </div>
+
+          <div class="info-box">
+            <h3><span>🌌</span> Nhị Thập Bát Tú (28 Sao)</h3>
+            <p><strong>Sao chiếu:</strong> <span id="snSao28" style="font-weight:700;">Sao Tỉnh • Tốt</span></p>
+            <p><strong>Tượng sao:</strong> <span id="snDongVat">Tỉnh mộc hãn</span></p>
+            <div class="poem-card" id="snThoSao" style="font-size:0.85rem; padding:8px 12px; margin:6px 0;"></div>
+          </div>
+
+          <div class="info-box">
+            <h3><span>☯️</span> Lục Diệu & Khổng Minh Xuất Hành</h3>
+            <p><strong>Lục Diệu ngày:</strong> <span id="snLucDieu" style="font-weight:700; color:var(--gold);">Tiểu Cát • Tốt</span></p>
+            <p class="subtext" id="snLucDieuMoTa" style="margin-top:4px;">Rất tốt lành, xuất hành may mắn...</p>
+            <div style="border-top:1px dashed var(--border); margin:8px 0; padding-top:8px;">
+              <p><strong>Thần Sát Xuất Hành:</strong> <span id="snThanSatKM" style="font-weight:700; color:#6ee7b7;">Thiên Tài • Tốt</span></p>
+              <p class="subtext" id="snThanSatKMYNghia" style="margin-top:4px; font-style:italic; line-height:1.5;"></p>
+            </div>
+            <div style="font-size:0.85rem; color:#cbd5e1; margin-top:6px;">
+              <strong>Hướng xuất hành cát lợi:</strong> Hỷ Thần: <span id="snHuongHyThan" style="color:var(--gold); font-weight:700;">Đông Bắc</span> • Tài Thần: <span id="snHuongTaiThan" style="color:#6ee7b7; font-weight:700;">Chính Nam</span> • Hạc Thần (tránh): <span id="snHuongHacThan" style="color:#fca5a5;">Chính Bắc</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 16px;">
+          <div class="info-box">
+            <h3><span>⏰</span> Giờ Hoàng Đạo</h3>
+            <div id="snGioHoangDao" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+          </div>
+          <div class="info-box">
+            <h3><span>⏳</span> Giờ Hắc Đạo</h3>
+            <div id="snGioHacDao" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="info-box" style="background:#082d23; border-color:#0d6b47;">
+            <h3 style="color:#6ee7b7;"><span>✨</span> Việc Nên Làm Hôm Nay</h3>
+            <p id="snViecNen" style="line-height:1.75; color:#e2e8f0;">Ngày tốt, loại bỏ điều xấu, chữa bệnh, cầu an, thi cử công danh...</p>
+          </div>
+          <div class="info-box" style="background:#341219; border-color:#851b29;">
+            <h3 style="color:#fca5a5;"><span>🚫</span> Việc Cần Kiêng Cữ Hôm Nay</h3>
+            <p id="snViecKieng" style="line-height:1.75; color:#e2e8f0;">Kiêng việc tang ma, tranh chấp kiện tụng...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: TÍNH TRÙNG TANG (CHUẨN SIM KINH DỊCH & BÁT TRẠCH TANG TẾ) -->
+    <div id="tab4" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2><span>🕊️</span> Bấm Độn Trùng Tang, Thiên Di, Nhập Mộ</h2>
+        </div>
+        <p class="subtext">Phép bấm độn cổ truyền Bát Trạch tang tế: Nam khởi Dần tiến thuận, Nữ khởi Thân nghịch thoái, đối soát bốn cung Năm • Tháng • Ngày • Giờ mất, quy luật "Nhất Mộ sát tam trùng", kiểm tra Thần Trùng, bài thơ ca quyết và phương pháp hóa giải.</p>
+
+        <!-- FORM NHẬP LIỆU NGƯỜI MẤT -->
+        <form id="tangForm" class="form-grid" style="margin-bottom:18px;">
+          <div class="form-group">
+            <label>Họ và tên người mất:</label>
+            <input type="text" id="tangHoTen" placeholder="Ví dụ: Nguyễn Văn A">
+          </div>
+          <div class="form-group">
+            <label>Giới tính người mất:</label>
+            <select id="tangGioiTinh">
+              <option value="nam" selected>Nam giới • Khởi Dần tiến thuận</option>
+              <option value="nu">Nữ giới • Khởi Thân nghịch thoái</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Năm sinh âm lịch của người mất:</label>
+            <input type="number" id="tangNamSinh" min="1900" max="2100" value="1948">
+          </div>
+          <div class="form-group">
+            <label>Năm mất âm lịch:</label>
+            <input type="number" id="tangNamChet" min="1900" max="2100" value="2026">
+          </div>
+          <div class="form-group">
+            <label>Tháng mất âm lịch:</label>
+            <input type="number" id="tangThangChet" min="1" max="12" value="2">
+          </div>
+          <div class="form-group">
+            <label>Ngày mất âm lịch:</label>
+            <input type="number" id="tangNgayChet" min="1" max="30" value="7">
+          </div>
+          <div class="form-group">
+            <label>Giờ mất:</label>
+            <select id="tangGioChet">
+              <option value="0">Giờ Tý • 23:00 - 00:59</option>
+              <option value="1">Giờ Sửu • 01:00 - 02:59</option>
+              <option value="2">Giờ Dần • 03:00 - 04:59</option>
+              <option value="3">Giờ Mão • 05:00 - 06:59</option>
+              <option value="4">Giờ Thìn • 07:00 - 08:59</option>
+              <option value="5">Giờ Tỵ • 09:00 - 10:59</option>
+              <option value="6" selected>Giờ Ngọ • 11:00 - 12:59</option>
+              <option value="7">Giờ Mùi • 13:00 - 14:59</option>
+              <option value="8">Giờ Thân • 15:00 - 16:59</option>
+              <option value="9">Giờ Dậu • 17:00 - 18:59</option>
+              <option value="10">Giờ Tuất • 19:00 - 20:59</option>
+              <option value="11">Giờ Hợi • 21:00 - 22:59</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary" style="height:44px;">⚖️ Tính Trùng Tang Chi Tiết</button>
+        </form>
+
+        <!-- KẾT QUẢ TRÙNG TANG -->
+        <div id="resTrungTang" style="margin-top:16px;">
+          <!-- THẺ TỔNG QUAN NGƯỜI MẤT -->
+          <div class="info-box highlight" style="margin-bottom:16px;">
+            <div style="font-size:1.15rem; font-weight:800; color:var(--gold);" id="ttTieuDeNguoiMat">Người mất: Nam giới • Hưởng thọ 79 tuổi mụ</div>
+            <div style="margin-top:6px; font-size:0.92rem; color:#cbd5e1;" id="ttThongTinChiTiet">Năm sinh: Mậu Tý • 1948 • Mất: Ngày 7 tháng 2 năm Bính Ngọ • 2026 • Giờ Ngọ</div>
+          </div>
+
+          <!-- BẢNG 4 CUNG TRÙNG TANG (NĂM - THÁNG - NGÀY - GIỜ) -->
+          <h3 style="color:var(--gold); margin:0 0 10px;"><span>🧭</span> Bảng Đối Chiếu Bốn Cung Cát Hung</h3>
+          <div class="grid-4" style="margin-bottom:18px;">
+            <div class="info-box" style="text-align:center;">
+              <div style="font-weight:700; color:var(--text-muted); font-size:0.85rem;">CUNG TUỔI</div>
+              <div style="font-size:1.25rem; font-weight:800; margin:6px 0;" id="ttCungNam">Cung Tỵ</div>
+              <div id="ttBadgeNam" class="badge bad">Trùng Tang</div>
+              <div class="subtext" style="margin-top:4px;" id="ttDanhGiaNam">Xấu • Trùng Năm</div>
+            </div>
+
+            <div class="info-box" style="text-align:center;">
+              <div style="font-weight:700; color:var(--text-muted); font-size:0.85rem;">CUNG THÁNG</div>
+              <div style="font-size:1.25rem; font-weight:800; margin:6px 0;" id="ttCungThang">Cung Mùi</div>
+              <div id="ttBadgeThang" class="badge good">Nhập Mộ</div>
+              <div class="subtext" style="margin-top:4px;" id="ttDanhGiaThang">Tốt • Cát Lành</div>
+            </div>
+
+            <div class="info-box" style="text-align:center;">
+              <div style="font-weight:700; color:var(--text-muted); font-size:0.85rem;">CUNG NGÀY</div>
+              <div style="font-size:1.25rem; font-weight:800; margin:6px 0;" id="ttCungNgay">Cung Dần</div>
+              <div id="ttBadgeNgay" class="badge bad">Trùng Tang</div>
+              <div class="subtext" style="margin-top:4px;" id="ttDanhGiaNgay">Xấu • Trùng Ngày</div>
+            </div>
+
+            <div class="info-box" style="text-align:center;">
+              <div style="font-weight:700; color:var(--text-muted); font-size:0.85rem;">CUNG GIỜ</div>
+              <div style="font-size:1.25rem; font-weight:800; margin:6px 0;" id="ttCungGio">Cung Dậu</div>
+              <div id="ttBadgeGio" class="badge">Thiên Di</div>
+              <div class="subtext" style="margin-top:4px;" id="ttDanhGiaGio">Bình Hòa • Thuận Lẽ Trời</div>
+            </div>
+          </div>
+
+          <!-- KẾT LUẬN & LUẬN GIẢI CHUẨN SIM KINH DỊCH -->
+          <div class="info-box highlight" style="margin-bottom:18px;">
+            <h3 style="margin-top:0;"><span>📌</span> Kết Luận & Luận Giải Tang Sự</h3>
+            <div style="font-size:1.25rem; font-weight:800; color:#6ee7b7; margin-bottom:8px;" id="ttKetLuan">Được Nhập Mộ • Cát Lành, Yên Ổn</div>
+            <p id="ttChiTiet" style="line-height:1.75; font-size:0.95rem; margin:0 0 10px;"></p>
+            
+            <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; border-top:1px dashed var(--border); padding-top:10px;">
+              <div><strong>Phạm Thần Trùng:</strong> <span id="ttPhamThanTrung" class="badge good">Không phạm Thần Trùng</span></div>
+              <div id="ttChiTietCapDo" style="font-size:0.9rem; color:var(--text-muted);"></div>
+            </div>
+          </div>
+
+          <!-- BÀI THƠ TANG SỰ CA QUYẾT TỪ FILE EXCEL (GIỮ NGUYÊN SHEET TEST) -->
+          <div class="card" style="margin-bottom:18px;">
+            <div class="card-header" style="border-bottom-color:var(--gold-border);">
+              <h3 style="color:var(--gold); margin:0;"><span>📜</span> Bài Thơ Tang Sự Ca Quyết • Điềm Báo <span id="ttPoemName">Mục Yêu</span></h3>
+            </div>
+            <p class="subtext" style="margin-top:6px;">Bài thơ ca quyết bốn câu từ cổ bản lưu truyền dự đoán hậu vận con cháu và phong thủy mồ mả gia tộc:</p>
+            <div class="poem-card" id="ttPoemText" style="font-size:1.02rem; line-height:1.9;"></div>
+          </div>
+
+          <!-- THÔNG TIN BỔ SUNG TỪ WEB SIM KINH DỊCH -->
+          <div class="card">
+            <div class="card-header">
+              <h3 style="color:var(--gold); margin:0;"><span>📚</span> Kiến Thức & Phương Pháp Hóa Giải Tang Sự</h3>
+            </div>
+
+            <div class="knowledge-box">
+              <h4>Ý Nghĩa Ba Trạng Thái Trùng Tang, Thiên Di, Nhập Mộ</h4>
+              <ul>
+                <li><strong>Nhóm Nhập Mộ:</strong> Thìn, Tuất, Sửu, Mùi • Tứ Mộ. Là điềm cát lành nhất. Người mất đã hết duyên trần thế, an nghỉ cõi vĩnh hằng, cửa âm đã khép lại. Dân gian đúc kết: <em>"Nhất Mộ sát tam trùng"</em> – chỉ cần có một cung Nhập Mộ là đã đủ sức hóa giải các cung Trùng Tang, gia quyến hoàn toàn yên tâm.</li>
+                <li><strong>Nhóm Thiên Di:</strong> Tý, Ngọ, Mão, Dậu • Tứ Vượng. Biểu thị sự ra đi do trời định, hợp với quy luật tự nhiên của đất trời, không tốt cũng không xấu.</li>
+                <li><strong>Nhóm Trùng Tang:</strong> Dần, Thân, Tỵ, Hợi • Tứ Sinh. Biểu thị sự ra đi chưa dứt khoát, âm khí chưa đóng. Trong đó: <strong>Trùng Ngày • Tam Xa</strong> là nặng nhất; <strong>Trùng Tháng • Nhị Xa</strong> nặng nhì; <strong>Trùng Giờ • Nhất Xa</strong> nặng vừa; <strong>Trùng Năm</strong> nhẹ nhất, qua ba năm mãn tang sẽ thoát hạn.</li>
+              </ul>
+            </div>
+
+            <div class="knowledge-box" style="margin-top:12px;">
+              <h4>Phương Pháp Hóa Giải Trùng Tang Theo Cổ Truyền</h4>
+              <ul>
+                <li><strong>Gửi vong lên chùa linh thiêng:</strong> Đưa vong linh vào chùa có giới luật nghiêm minh như Chùa Hàm Long tại Bắc Ninh để nương nhờ oai lực Tam Bảo, sớm ngày siêu sinh tịnh độ.</li>
+                <li><strong>Kiêng cúng gọi tên người mất:</strong> Khi đã gửi vong lên chùa, người nhà ở nhà tuyệt đối không lập bàn thờ hương khói gọi tên vong hồn về nhà ăn cơm, tránh âm khí theo về.</li>
+                <li><strong>Tụng kinh sám hối & làm phước:</strong> Gia đình nên thỉnh chư tăng hoặc tự mình tụng Kinh Địa Tạng, Kinh A Di Đà, làm nhiều việc thiện, phóng sinh tu phước hồi hướng công đức cho người đã khuất.</li>
+                <li><strong>Chọn ngày giờ khâm liệm, an táng:</strong> Chọn giờ Hoàng Đạo, ngày cát lành, tránh tuyệt đối các ngày phạm sát chủ âm, thọ tử, trùng phục.</li>
+              </ul>
+            </div>
+
+            <div class="knowledge-box" style="margin-top:12px;">
+              <h4>Các Ngày Kỵ Lớn Trong Tang Lễ</h4>
+              <p>Khi tiến hành tang sự, cổ thư Thông Thư khuyên cần kiêng kỵ các ngày sau:</p>
+              <ul>
+                <li><strong>Ngày Trùng Tang & Trùng Phục:</strong> Ngày có chi trùng với các cung Dần, Thân, Tỵ, Hợi hoặc trùng với chi tuổi người mất.</li>
+                <li><strong>Ngày Thần Trùng:</strong> Tháng 1 & 7 gặp ngày Tý; Tháng 2 & 8 ngày Dần; Tháng 3 & 9 ngày Thìn; Tháng 4 & 10 ngày Ngọ; Tháng 5 & 11 ngày Thân; Tháng 6 & 12 ngày Tuất.</li>
+                <li><strong>Ngày Sát Chủ Âm:</strong> Tháng 1 ngày Dần, 2 Thân, 3 Mão, 4 Dậu, 5 Thìn, 6 Tuất, 7 Tỵ, 8 Hợi, 9 Tý, 10 Ngọ, 11 Sửu, 12 Mùi.</li>
+                <li><strong>Ngày Thụ Tử:</strong> Tháng 1 ngày Tuất, 2 Thìn, 3 Hợi, 4 Tỵ, 5 Tý, 6 Ngọ, 7 Sửu, 8 Mùi, 9 Dần, 10 Thân, 11 Mão, 12 Dậu.</li>
+                <li><strong>Ngày Tam Tang:</strong> Kiêng hạ huyệt, an táng để tránh họa tang chồng tang.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: LÁ SỐ TỬ VI ĐẨU SỐ (SRS TỬ VI ĐẨU SỐ TÍCH HỢP TOÀN DIỆN) -->
+    <div id="tab5" class="tab-content">
+      <div class="card" style="padding: 12px;">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+          <div>
+            <h2 style="margin:0;"><span>🌌</span> Thiên Bàn Lá Số Tử Vi Đẩu Số &amp; Sổ Tay Bình Giải 12 Cung</h2>
+            <p class="subtext" style="margin:4px 0 0;">Tự động lập lá số theo Ngày sinh, Giờ sinh, Giới tính và Năm xem hạn đã chọn ở trên. Bấm vào từng cung trên lá số hoặc thanh chọn cung để xem chi tiết &amp; thêm lời bình giải.</p>
+          </div>
+        </div>
+        <div style="width:100%; border-radius:12px; overflow:hidden; border:1px solid var(--border); background:#11111b;">
+          <iframe id="tuviFrame" src="tuvi/index.html" style="width:100%; height:1500px; border:none; display:block;" title="Lá Số Tử Vi Đẩu Số"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: LÁ SỐ BÁT TỰ - TỨ TRỤ CHUẨN PHONGTHUYVUONG.COM (CHẾ ĐỘ DARK MODE) -->
+    <div id="tab6" class="tab-content">
+      <div class="card" id="ptvBaziRoot">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h2 style="margin:0;"><span>☯️</span> Lá Số Bát Tự - Tứ Trụ &amp; Biểu Đồ Ngũ Hành Tương Phối</h2>
+            <p class="subtext" style="margin:4px 0 0;">Tự động lập lá số Bát Tự chuẩn Tiết Khí theo Ngày sinh, Giờ sinh, Giới tính và Năm xem hạn. Bấm vào từng cột Đại vận, Lưu niên, Lưu nguyệt hoặc nút Tương phối để phân tích chuyên sâu.</p>
+          </div>
+        </div>
+
+        <!-- Khung thông tin mệnh chủ (.user-info) -->
+        <div id="ptvUserInfoSlot" class="ptv-user-info-grid"></div>
+
+        <!-- Thanh công cụ Tứ trụ | Đại vận | Lưu niên | Lưu nguyệt | Tương phối -->
+        <ul class="ptv-subnav">
+          <li><button type="button" class="ptv-subnav-btn" data-ptv-tab="bazi">Tứ trụ (4 Trụ Gốc)</button></li>
+          <li><button type="button" class="ptv-subnav-btn" data-ptv-tab="dai-van">Đại vận</button></li>
+          <li><button type="button" class="ptv-subnav-btn" data-ptv-tab="luu-nien">Lưu niên</button></li>
+          <li><button type="button" class="ptv-subnav-btn" data-ptv-tab="luu-nguyet">Lưu nguyệt</button></li>
+          <li><button type="button" class="ptv-subnav-btn" data-ptv-tab="tuong-phoi">🔗 Tương phối (Hợp / Xung / Hình / Hại)</button></li>
+        </ul>
+
+        <!-- Bảng Tứ Trụ Tinh Bàn + Thần Sát + Tương Phối -->
+        <div id="ptvBaziTableSlot" class="ptv-table-wrapper"></div>
+
+        <!-- Hộp thoại giải nghĩa Thần Sát khi bấm vào từng sao -->
+        <div id="ptvShenShaModal" style="display:none; margin-top:14px; background:#16223b; border:1px solid #f59e0b; border-radius:10px; padding:14px 18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong id="ptvShenShaModalTitle" style="color:#fcd34d; font-size:1rem;"></strong>
+            <button type="button" id="ptvCloseShenShaModal" style="background:transparent; border:1px solid #475569; color:#cbd5e1; border-radius:6px; padding:2px 10px; cursor:pointer;">Đóng ✕</button>
+          </div>
+          <div id="ptvShenShaModalDesc" style="font-size:0.92rem; color:#e2e8f0; line-height:1.6;"></div>
+        </div>
+
+        <!-- Khung 8 Đại Vận -->
+        <div id="ptv-box-dai-van">
+          <h3 class="ptv-section-heading">Đại vận (8 Đại vận 10 năm)</h3>
+          <p class="ptv-section-sub">💡 Bấm vào một cột Đại vận để nạp trụ Đại vận vào bảng Tứ Trụ và mở 10 năm Lưu niên tương ứng</p>
+          <div id="ptvDaiVanSlot"></div>
+        </div>
+
+        <!-- Khung 10 Lưu Niên -->
+        <div id="ptv-box-luu-nien">
+          <h3 class="ptv-section-heading">Lưu niên (10 năm trong Đại vận)</h3>
+          <p class="ptv-section-sub">💡 Bấm vào một năm Lưu niên để nạp trụ Lưu niên vào bảng Tứ Trụ và xem 12 tháng Lưu nguyệt của năm đó</p>
+          <div id="ptvLuuNienSlot"></div>
+        </div>
+
+        <!-- Khung 12 Lưu Nguyệt -->
+        <div id="ptv-box-luu-nguyet">
+          <h3 class="ptv-section-heading" id="ptvLuuNguyetYearTitle">Lưu nguyệt (12 tháng Tiết khí)</h3>
+          <p class="ptv-section-sub">💡 Bấm vào một tháng Lưu nguyệt để đưa thêm cột Lưu nguyệt vào bảng Tứ Trụ</p>
+          <div id="ptvLuuNguyetSlot"></div>
+        </div>
+
+        <!-- Biểu đồ Tròn & Bảng Tỷ Lệ Ngũ Hành (Nguyên Bản & Tương Phối) -->
+        <div class="section-divider">
+          <h3 class="ptv-section-heading" style="margin-top:6px;">📊 Tỷ Lệ Ngũ Hành Nguyên Bản &amp; Ngũ Hành Tương Phối</h3>
+          <div class="ptv-charts-row">
+            <div class="ptv-chart-box">
+              <canvas id="ptvChartNguyenBan" width="380" height="310"></canvas>
+              <div id="ptvLegendNguyenBan" class="ptv-chart-legend">
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#cbd5e1;"></span>Kim</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#22c55e;"></span>Mộc</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#3b82f6;"></span>Thủy</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#ef4444;"></span>Hỏa</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#eab308;"></span>Thổ</span>
+              </div>
+            </div>
+            <div class="ptv-chart-box">
+              <canvas id="ptvChartTuongPhoi" width="380" height="310"></canvas>
+              <div id="ptvLegendTuongPhoi" class="ptv-chart-legend">
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#cbd5e1;"></span>Kim</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#22c55e;"></span>Mộc</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#3b82f6;"></span>Thủy</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#ef4444;"></span>Hỏa</span>
+                <span class="ptv-legend-item"><span class="ptv-legend-swatch" style="background:#eab308;"></span>Thổ</span>
+              </div>
+            </div>
+          </div>
+          <div id="ptvNguHanhTableSlot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THÔNG TIN INTERNET / WIKIPEDIA -->
+    <div class="card" style="margin-top: 22px;">
+      <div class="card-header">
+        <h2><span>🌐</span> Tra Cứu Thông Tin Mở Rộng Từ Internet</h2>
+      </div>
+      <div id="extContent" style="line-height: 1.75; font-size: 0.95rem;">Đang tải thông tin từ Wikipedia...</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© Ứng dụng Phong Thủy & Lịch Thông Thư Ngọc Hạp • Tra Cứu Âm Dương, Bát Trạch, Hôn Phối & Trùng Tang</p>
+</footer>
+
+<!-- SCRIPT NẠP DỮ LIỆU & THUẬT TOÁN -->
+<script src="lunar.js"></script>
+<script src="tuoi.js"></script>
+<script src="data_tuoi.js"></script>
+<script src="data_phongthuy.js"></script>
+<script src="phongthuy.js"></script>
+<script src="logic_thongthu.js"></script>
+<script src="battu.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function () {});
+    });
+  }
+</script>
+</body>
+</html>
