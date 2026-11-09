@@ -1,4 +1,4 @@
-var CACHE_NAME = 'thong-thu-bat-co-v6';
+var CACHE_NAME = 'thong-thu-bat-co-v20';
 var ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ var ASSETS = [
   './tuvi/calendar.js',
   './tuvi/engine.js',
   './tuvi/star_kb.js',
+  './tuvi/saoduyen_luan.js',
   './tuvi/app.js',
   './tuvi/ai.js'
 ];
@@ -47,10 +48,15 @@ self.addEventListener('activate', function (event) {
   self.clients.claim();
 });
 
+// Network-first strategy so code & layout updates always appear immediately
 self.addEventListener('fetch', function (event) {
   event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      return cached || fetch(event.request);
-    })
+    fetch(event.request)
+      .then(function (response) {
+        return response;
+      })
+      .catch(function () {
+        return caches.match(event.request);
+      })
   );
 });
