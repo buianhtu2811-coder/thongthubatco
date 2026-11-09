@@ -140,16 +140,24 @@
     } catch (e) {}
 
     try {
-      var curSrc = frame.getAttribute('src') || '';
-      if (curSrc.indexOf('tuvi/index.html') === 0) {
-        var hashStr = '#sd=' + dob.d +
-          '&sm=' + dob.m +
-          '&sy=' + dob.y +
-          '&gender=' + encodeURIComponent(payload.gender) +
-          '&hc=' + gioSinhIdx +
-          '&vy=' + namXetVal +
-          '&name=' + encodeURIComponent(payload.name);
-        frame.setAttribute('src', 'tuvi/index.html' + hashStr);
+      if (window.__TUVI_SRCDOC__ && !frame._srcdocLoaded) {
+        frame._srcdocLoaded = true;
+        frame.srcdoc = window.__TUVI_SRCDOC__;
+      } else if (!frame._srcdocLoaded && !frame.getAttribute('srcdoc')) {
+        var curSrc = frame.getAttribute('src') || '';
+        if (curSrc.indexOf('tuvi/index.html') === 0) {
+          var baseUrl = curSrc.split('#')[0];
+          var hashStr = '#sd=' + dob.d +
+            '&sm=' + dob.m +
+            '&sy=' + dob.y +
+            '&gender=' + encodeURIComponent(payload.gender) +
+            '&hc=' + gioSinhIdx +
+            '&vy=' + namXetVal +
+            '&name=' + encodeURIComponent(payload.name);
+          if (curSrc !== baseUrl + hashStr) {
+            frame.setAttribute('src', baseUrl + hashStr);
+          }
+        }
       }
     } catch (e) {}
 

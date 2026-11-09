@@ -1,4 +1,4 @@
-var CACHE_NAME = 'thong-thu-bat-co-v20';
+var CACHE_NAME = 'thong-thu-bat-co-v22';
 var ASSETS = [
   './',
   './index.html',
@@ -13,21 +13,17 @@ var ASSETS = [
   './data_tuoi.js',
   './icon-192.png',
   './icon-512.png',
-  './manifest.json',
-  './tuvi/index.html',
-  './tuvi/style.css',
-  './tuvi/calendar.js',
-  './tuvi/engine.js',
-  './tuvi/star_kb.js',
-  './tuvi/saoduyen_luan.js',
-  './tuvi/app.js',
-  './tuvi/ai.js'
+  './manifest.json'
 ];
 
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(ASSETS);
+      return Promise.all(
+        ASSETS.map(function (url) {
+          return cache.add(url).catch(function () {});
+        })
+      );
     })
   );
   self.skipWaiting();
